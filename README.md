@@ -20,3 +20,11 @@ Hocam, bu hafta projenin Gereksinim Analizi, Figma Tasarımı ve Navigasyon İsk
 Figma üzerinde Dashboard ve Detay ekranlarının matematiksel koordinatlarla tasarımını bitirdim. Expo Managed Workflow ile projeyi ayağa kaldırdım ve React Navigation (Stack & Tab) kurulumu ile sayfalar arası geçiş mimarisini oturttum.
 
 Bu haftaki ilerlememi detaylıca anlattığım videom şu linktedir: https://youtu.be/EbYcll97KKY
+
+Hafta 3: API Entegrasyonu ve Asenkron Hata Yönetimi
+
+Hocam, bu hafta projenin dış veri akışını sağlamak amacıyla Axios ile CoinGecko REST API'sine asenkron bağlantı kurulumunu tamamladım. 
+
+Basit bir API çağrısı yapmak yerine, projede belirttiğim mimari kararlara sadık kalarak `src/api/` klasörü altında merkezi bir Axios Instance (`axiosClient.js`) oluşturdum. API'den dönen JSON verisini "Interceptor" yapısıyla parse ettim ve HTTP asenkron hata yönetimini (Rate Limit, Network Error vb.) tek bir merkezden kontrol altına aldım. Kripto verilerini çekme işlemlerini ise `cryptoService.js` dosyasında izole ettim.
+
+Bu haftaki ilerlememi detaylıca anlattığım videom şu linktedir: [VİDEO 2 URL BURAYA GELECEK]
