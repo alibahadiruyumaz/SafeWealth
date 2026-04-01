@@ -28,3 +28,11 @@ Hocam, bu hafta projenin dış veri akışını sağlamak amacıyla Axios ile Co
 Basit bir API çağrısı yapmak yerine, projede belirttiğim mimari kararlara sadık kalarak `src/api/` klasörü altında merkezi bir Axios Instance (`axiosClient.js`) oluşturdum. API'den dönen JSON verisini "Interceptor" yapısıyla parse ettim ve HTTP asenkron hata yönetimini (Rate Limit, Network Error vb.) tek bir merkezden kontrol altına aldım. Kripto verilerini çekme işlemlerini ise `cryptoService.js` dosyasında izole ettim.
 
 Bu haftaki ilerlememi detaylıca anlattığım videom şu linktedir: https://youtu.be/dcKz048SEzE
+
+Hafta 4: Global State Yönetimi (Redux) ve Performans Optimizasyonu
+
+Hocam, bu hafta API'den gelen verileri uygulamanın her noktasından tutarlı bir şekilde yönetebilmek için Redux Toolkit entegrasyonunu ve ana ekranın listeleme optimizasyonlarını tamamladım.
+
+Uygulamanın asenkron durum yönetimini createAsyncThunk yapısıyla cryptoSlice.js içerisinde izole ettim. Arayüz tarafında ise cihaz RAM'ini korumak ve listeleme performansını artırmak (Virtualization) amacıyla FlatList üzerinde React.memo, windowSize ve initialNumToRender parametrelerini devreye aldım. Ayrıca API'den gelen eksik (null) veya çok küçük değerli (Shiba Inu vb.) varlıklar için "Safe Render" ve "Dinamik Fiyat Hassasiyeti" algoritmaları kurgulayarak uygulamanın Figma tasarımlarındaki profesyonel nizamda çalışmasını sağladım.
+
+Bu haftaki ilerlememi detaylıca anlattığım videom şu linktedir: https://youtu.be/UbhO8kb9GGw
