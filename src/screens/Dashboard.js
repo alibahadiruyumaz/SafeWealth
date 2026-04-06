@@ -1,28 +1,41 @@
 import React, { useEffect, useCallback, useMemo } from 'react';
-import { View, Text, FlatList, ActivityIndicator, StyleSheet, SafeAreaView } from 'react-native';
+import { View, Text, FlatList, ActivityIndicator, StyleSheet, TouchableOpacity } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchCryptoData } from '../store/slices/cryptoSlice';
+import { useNavigation } from '@react-navigation/native';
+
+// YENİ: Modern SafeAreaView importunu buraya ekledik
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 /**
  * Figma Tasarımına Sadık Liste Elemanı
  * React.memo ile sarmalanarak sadece verisi değiştiğinde re-render olur.
  */
 const CryptoListItem = React.memo(({ item }) => {
-  // Dinamik Hassasiyet: Fiyat çok küçükse daha fazla basamak gösterir (Shiba Inu vb.)
+  const navigation = useNavigation(); // Sayfa geçişi için kancamız
+
   const formatPrice = (price) => {
     if (price >= 1) {
       return price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     } else if (price > 0.001) {
       return price.toFixed(4);
     } else {
-      return price.toFixed(8); // Çok küçük fiyatlı coinler için 8 basamak
+      return price.toFixed(8);
     }
   };
 
   const isPositive = item.price_change_percentage_24h >= 0;
 
   return (
-    <View style={styles.itemContainer}>
+    // View yerine TouchableOpacity kullandık ve onPress ekledik:
+    <TouchableOpacity 
+      style={styles.itemContainer}
+      activeOpacity={0.7} // Tıklanma hissiyatı (hafif solma)
+      onPress={() => navigation.navigate('Detail', { 
+        coinId: item.id, 
+        coinName: item.name 
+      })}
+    >
       {/* SOL SÜTUN: İsim ve Sembol */}
       <View style={styles.nameContainer}>
         <Text style={styles.coinName} numberOfLines={1}>{item.name}</Text>
@@ -36,7 +49,7 @@ const CryptoListItem = React.memo(({ item }) => {
           {isPositive ? '▲' : '▼'} {Math.abs(item.price_change_percentage_24h || 0).toFixed(2)}%
         </Text>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 });
 
@@ -116,7 +129,7 @@ const styles = StyleSheet.create({
   },
   headerContainer: {
     paddingHorizontal: 20,
-    paddingTop: 50,    // 30'dan 50'ye çıkardık, artık kamera deliğinden tamamen bağımsız ve ferah duracak.
+    paddingTop: 50,    // Artık kamera deliğinden tamamen bağımsız ve ferah duracak.
     paddingBottom: 25, // Alt kısımla mesafeyi de biraz artırarak başlığın "sıkışmış" hissini tamamen yok ettik.
     backgroundColor: '#FFFFFF',
     borderBottomWidth: 1,

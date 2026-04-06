@@ -1,5 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit';
 import cryptoReducer from './slices/cryptoSlice';
+import favoritesReducer from './slices/favoritesSlice';
 
 /**
  * Single Source of Truth (Tek Doğru Kaynağı)
@@ -8,6 +9,7 @@ import cryptoReducer from './slices/cryptoSlice';
 export const store = configureStore({
   reducer: {
     crypto: cryptoReducer,
+    favorites: favoritesReducer,
     // İlerleyen haftalarda AsyncStorage ile çekeceğimiz kullanıcı bakiyelerini 
     // yönetecek olan "portfolioReducer" da buraya eklenecek.
   },
