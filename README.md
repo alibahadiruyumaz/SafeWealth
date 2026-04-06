@@ -36,3 +36,13 @@ Hocam, bu hafta API'den gelen verileri uygulamanın her noktasından tutarlı bi
 Uygulamanın asenkron durum yönetimini createAsyncThunk yapısıyla cryptoSlice.js içerisinde izole ettim. Arayüz tarafında ise cihaz RAM'ini korumak ve listeleme performansını artırmak (Virtualization) amacıyla FlatList üzerinde React.memo, windowSize ve initialNumToRender parametrelerini devreye aldım. Ayrıca API'den gelen eksik (null) veya çok küçük değerli (Shiba Inu vb.) varlıklar için "Safe Render" ve "Dinamik Fiyat Hassasiyeti" algoritmaları kurgulayarak uygulamanın Figma tasarımlarındaki profesyonel nizamda çalışmasını sağladım.
 
 Bu haftaki ilerlememi detaylıca anlattığım videom şu linktedir: https://youtu.be/UbhO8kb9GGw
+
+Hafta 5: Detay Analiz Sayfası, Dinamik Grafik Entegrasyonu ve Favori Yönetimi
+
+Hocam, bu hafta projenin kullanıcı etkileşimi ve veri görselleştirme katmanlarını kapsayan Detay Analiz Ekranı ve Redux Tabanlı Favori (Watchlist) Sistemi geliştirmelerini tamamladım.
+
+Uygulamanın navigasyon mimarisini geliştirerek, ana sayfadaki varlıkların benzersiz ID'lerini React Navigation üzerinden detay sayfasına dinamik parametre olarak aktardım. Detay ekranında, CoinGecko API'den gelen 7 günlük geçmiş fiyat verilerini (Historical Data) asenkron olarak çeken yeni bir servis fonksiyonu kurguladım. Bu verileri görselleştirmek için react-native-chart-kit entegrasyonunu yaparak, "Bezier" (kavisli) çizim algoritmasıyla profesyonel borsa grafiklerini hayata geçirdim.
+
+Ayrıca, global state yönetimini bir adım öteye taşıyarak favoritesSlice.js dosyasını oluşturdum. Bu sayede kullanıcıların seçtiği varlıkları cihaz tabanlı merkezi hafızada (Redux Store) tutan "Favorilere Ekleme" özelliğini, ikon tabanlı bir UI geri bildirimiyle birlikte sisteme dahil ettim. Büyük finansal verilerin (Milyar/Milyon) ekranda taşma yapmaması için formatCompactNumber gibi yardımcı fonksiyonlar yazarak arayüzün profesyonel nizamını korudum.
+
+Bu haftaki ilerlememi detaylıca anlattığım videom şu linktedir: https://youtu.be/ldD9mlir7Z4
