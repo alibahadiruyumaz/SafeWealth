@@ -46,3 +46,13 @@ Uygulamanın navigasyon mimarisini geliştirerek, ana sayfadaki varlıkların be
 Ayrıca, global state yönetimini bir adım öteye taşıyarak favoritesSlice.js dosyasını oluşturdum. Bu sayede kullanıcıların seçtiği varlıkları cihaz tabanlı merkezi hafızada (Redux Store) tutan "Favorilere Ekleme" özelliğini, ikon tabanlı bir UI geri bildirimiyle birlikte sisteme dahil ettim. Büyük finansal verilerin (Milyar/Milyon) ekranda taşma yapmaması için formatCompactNumber gibi yardımcı fonksiyonlar yazarak arayüzün profesyonel nizamını korudum.
 
 Bu haftaki ilerlememi detaylıca anlattığım videom şu linktedir: https://youtu.be/ldD9mlir7Z4
+
+Hafta 6: Portföy Yönetimi, CRUD Operasyonları ve Regex Veri Doğrulama
+
+Hocam, bu hafta projenin etkileşimli veri yönetimi katmanını oluşturan Cüzdan (Portföy) Yönetimi, Regex tabanlı veri doğrulama ve Alt Menü (Bottom Tab Navigation) mimarisi geliştirmelerini tamamladım.
+
+Uygulama navigasyon mimarisini @react-navigation/bottom-tabs ile profesyonel standartlara taşıyarak projeyi "Piyasalar" ve "Cüzdanım" olmak üzere iki ana sekmeye böldüm. Cüzdanım ekranında, kullanıcıların portföylerine manuel olarak varlık ekleyebileceği, mevcut miktarları güncelleyebileceği ve silebileceği (Create, Read, Update, Delete) kapsamlı bir Modal form yapısı kurguladım. Form güvenliğini sağlamak ve veri tutarlılığını korumak amacıyla /^\d*\.?\d*$/ düzenli ifadesi (Regex) ile özel bir validasyon katmanı geliştirdim; bu sayede form alanlarına harf, sembol veya negatif değer girilmesini donanımsal düzeyde engelledim.
+
+Ek olarak, portfolioSlice.js üzerinden Redux Store'a bağladığım bu portföy verilerini, react-native-chart-kit ile oluşturduğum Pasta Grafiği (Pie Chart) ile entegre ederek kullanıcının anlık cüzdan dağılımını dinamik hale getirdim. Son olarak, iOS ve Android platformları arasındaki donanımsal çentik (Notch / Dynamic Island) farklılıklarının arayüzü bozmasını engellemek için useSafeAreaInsets kancası ile Cross-Platform (çapraz platform) başlık optimizasyonlarını tamamladım.
+
+Bu haftaki ilerlememi detaylıca anlattığım videom şu linktedir: [VİDEO LİNKİ BURAYA GELECEK]
