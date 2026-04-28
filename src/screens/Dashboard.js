@@ -3,8 +3,6 @@ import { View, Text, FlatList, ActivityIndicator, StyleSheet, TouchableOpacity }
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchCryptoData } from '../store/slices/cryptoSlice';
 import { useNavigation } from '@react-navigation/native';
-
-// YENİ: Modern SafeAreaView importunu buraya ekledik
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 /**
@@ -12,7 +10,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
  * React.memo ile sarmalanarak sadece verisi değiştiğinde re-render olur.
  */
 const CryptoListItem = React.memo(({ item }) => {
-  const navigation = useNavigation(); // Sayfa geçişi için kancamız
+  const navigation = useNavigation();
 
   const formatPrice = (price) => {
     if (price >= 1) {
@@ -27,22 +25,19 @@ const CryptoListItem = React.memo(({ item }) => {
   const isPositive = item.price_change_percentage_24h >= 0;
 
   return (
-    // View yerine TouchableOpacity kullandık ve onPress ekledik:
     <TouchableOpacity 
       style={styles.itemContainer}
-      activeOpacity={0.7} // Tıklanma hissiyatı (hafif solma)
+      activeOpacity={0.7}
       onPress={() => navigation.navigate('Detail', { 
         coinId: item.id, 
         coinName: item.name 
       })}
     >
-      {/* SOL SÜTUN: İsim ve Sembol */}
       <View style={styles.nameContainer}>
         <Text style={styles.coinName} numberOfLines={1}>{item.name}</Text>
         <Text style={styles.coinSymbol}>{item.symbol.toUpperCase()}</Text>
       </View>
       
-      {/* SAĞ SÜTUN: Fiyat ve Değişim */}
       <View style={styles.priceContainer}>
         <Text style={styles.coinPrice}>${formatPrice(item.current_price)}</Text>
         <Text style={[styles.coinPercentage, { color: isPositive ? '#00C853' : '#FF3D00' }]}>
@@ -56,26 +51,21 @@ const CryptoListItem = React.memo(({ item }) => {
 export default function Dashboard() {
   const dispatch = useDispatch();
   
-  // Redux Store'dan verileri çekiyoruz
   const { data, status, error } = useSelector((state) => state.crypto);
 
   useEffect(() => {
-    // Sayfa açıldığında eğer veri yoksa API isteğini başlatır
     if (status === 'idle') {
       dispatch(fetchCryptoData());
     }
   }, [status, dispatch]);
 
-  // Filtreleme: Fiyatı 0 olan anlamsız verileri temizler
   const filteredData = useMemo(() => {
     return data.filter(coin => coin.current_price > 0);
   }, [data]);
 
-  // Performans Optimizasyonları
   const renderItem = useCallback(({ item }) => <CryptoListItem item={item} />, []);
   const keyExtractor = useCallback((item) => item.id.toString(), []);
 
-  // Yüklenme Ekranı
   if (status === 'loading') {
     return (
       <View style={styles.center}>
@@ -85,7 +75,6 @@ export default function Dashboard() {
     );
   }
 
-  // Hata Ekranı
   if (status === 'failed') {
     return (
       <View style={styles.center}>
@@ -97,7 +86,7 @@ export default function Dashboard() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.headerContainer}>
-        <Text style={styles.headerTitle}>Piyasa Takibi</Text>
+        <Text style={styles.headerTitle}>Piyasalar</Text>
         <Text style={styles.headerSubtitle}>Canlı Varlık Değerleri</Text>
       </View>
 
@@ -129,8 +118,8 @@ const styles = StyleSheet.create({
   },
   headerContainer: {
     paddingHorizontal: 20,
-    paddingTop: 50,    // Artık kamera deliğinden tamamen bağımsız ve ferah duracak.
-    paddingBottom: 25, // Alt kısımla mesafeyi de biraz artırarak başlığın "sıkışmış" hissini tamamen yok ettik.
+    paddingTop: 50,
+    paddingBottom: 25,
     backgroundColor: '#FFFFFF',
     borderBottomWidth: 1,
     borderBottomColor: '#F0F0F0',
@@ -140,7 +129,7 @@ const styles = StyleSheet.create({
     fontWeight: '800', 
     color: '#121212',
     letterSpacing: -0.5,
-    marginBottom: 4 // Alt başlıkla arasını biraz açtık
+    marginBottom: 4 
   },
   headerSubtitle: { 
     fontSize: 14, 

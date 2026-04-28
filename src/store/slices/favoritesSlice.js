@@ -3,7 +3,7 @@ import { createSlice } from '@reduxjs/toolkit';
 const favoritesSlice = createSlice({
   name: 'favorites',
   initialState: {
-    items: [], // Favori coin ID'lerini burada tutacağız (Örn: ['bitcoin', 'ethereum'])
+    items: [], // Favori coin ID'lerini burada tutacağız 
   },
   reducers: {
     // Favorilere ekle/çıkar mantığını tek fonksiyonda (toggle) hallediyoruz
