@@ -22,7 +22,7 @@ export default function PortfolioScreen() {
   const [amount, setAmount] = useState('');
   const [isEditing, setIsEditing] = useState(false);
 
-  // --- HOCANIN İSTEDİĞİ REGEX DOĞRULAMASI ---
+ 
   const validateInput = (text) => {
     // Regex: Sadece rakam ve bir adet nokta (.) kabul eder (Örn: 12.5)
     // Harf veya eksi değer girilmesini engeller.

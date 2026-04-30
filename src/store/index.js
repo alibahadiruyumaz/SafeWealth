@@ -1,18 +1,36 @@
-import { configureStore } from '@reduxjs/toolkit';
+import { configureStore, combineReducers } from '@reduxjs/toolkit';
+import { persistStore, persistReducer, FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER } from 'redux-persist';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 import cryptoReducer from './slices/cryptoSlice';
 import favoritesReducer from './slices/favoritesSlice';
-import portfolioReducer from './slices/portfolioSlice'; // YENİ: 6. Hafta Portföy hafızası eklendi
+import portfolioReducer from './slices/portfolioSlice';
 
-/**
- * Single Source of Truth (Tek Doğru Kaynağı)
- * Uygulamanın bellek yönetimini optimize eden ve tüm verilerin tutulduğu ana Redux deposu.
- */
-export const store = configureStore({
-  reducer: {
-    crypto: cryptoReducer,
-    favorites: favoritesReducer,
-    portfolio: portfolioReducer, // "İleride eklenecek" dediğimiz portföy yöneticisi artık aktif.
-  },
-  // Redux Toolkit varsayılan olarak middleware'leri otomatik yapılandırır,
-  // bu sayede RAM tüketimi asgari seviyede tutulur.
+// MİMARİ KARAR: Sadece yerelde kalması gereken kullanıcı verilerini seçiyoruz.
+const persistConfig = {
+  key: 'root',
+  storage: AsyncStorage,
+  // DİKKAT: 'crypto' bilerek dışarıda bırakılmıştır. Eski fiyatlar persist edilmez.
+  whitelist: ['favorites', 'portfolio'], 
+};
+
+const rootReducer = combineReducers({
+  crypto: cryptoReducer,
+  favorites: favoritesReducer,
+  portfolio: portfolioReducer,
 });
+
+const persistedReducer = persistReducer(persistConfig, rootReducer);
+
+export const store = configureStore({
+  reducer: persistedReducer,
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: {
+        // Redux Persist'in dahili aksiyonlarını serileştirme hatalarından gizler
+        ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
+      },
+    }),
+});
+
+export const persistor = persistStore(store);

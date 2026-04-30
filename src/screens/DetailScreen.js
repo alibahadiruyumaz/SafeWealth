@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useLayoutEffect } from 'react';
 import { View, Text, StyleSheet, Dimensions, ActivityIndicator, ScrollView, TouchableOpacity, Platform } from 'react-native';
-// YENİ: useSafeAreaInsets kancasını ekledik
+
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons'; 
 import { useSelector, useDispatch } from 'react-redux';
@@ -12,7 +12,7 @@ export default function DetailScreen({ route, navigation }) {
   const { coinId, coinName } = route.params;
   const dispatch = useDispatch();
   
-  // YENİ: Telefonun tepe (notch/status bar) boşluğunu milimetrik hesaplayan kanca
+  
   const insets = useSafeAreaInsets();
 
   const coinData = useSelector((state) => 
