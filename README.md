@@ -55,4 +55,4 @@ Uygulama navigasyon mimarisini @react-navigation/bottom-tabs ile profesyonel sta
 
 Ek olarak, portfolioSlice.js üzerinden Redux Store'a bağladığım bu portföy verilerini, react-native-chart-kit ile oluşturduğum Pasta Grafiği (Pie Chart) ile entegre ederek kullanıcının anlık cüzdan dağılımını dinamik hale getirdim. Son olarak, iOS ve Android platformları arasındaki donanımsal çentik (Notch / Dynamic Island) farklılıklarının arayüzü bozmasını engellemek için useSafeAreaInsets kancası ile Cross-Platform (çapraz platform) başlık optimizasyonlarını tamamladım.
 
-Bu haftaki ilerlememi detaylıca anlattığım videom şu linktedir: [VİDEO LİNKİ BURAYA GELECEK]
+Bu haftaki ilerlememi detaylıca anlattığım videom şu linktedir: https://youtu.be/6wnGWEs24TQ
