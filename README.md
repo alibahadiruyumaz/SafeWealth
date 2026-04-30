@@ -63,4 +63,4 @@ Hocam, bu hafta projenin ana vaadi olan "Privacy-First" (Gizlilik Öncelikli) ci
 
 Bütün global state'i kaydetmek yerine katı bir veri izolasyonu uygulayarak "Whitelist" kurgusu geliştirdim. Kullanıcının portföy varlıkları ve favori seçimleri cihaz hafızasına yazılırken, API'den gelen anlık piyasa fiyatlarını (crypto slice) kalıcılık çemberinin dışında bıraktım. Bu mimari hamle, uygulamanın çevrimdışı (offline) açıldığı durumlarda eski fiyatların güncelmiş gibi gösterilmesi riskini tamamen ortadan kaldırdı. Ayrıca, uygulamanın başlatılması sırasında cihaz diskinden belleğe veri aktarımının asenkron doğasından kaynaklanabilecek UI zafiyetlerini (cüzdanın geçici olarak boş görünmesi) önlemek amacıyla arayüz yüklemesini PersistGate bileşeni ile donanımsal düzeyde kilitledim. Bu sayede uygulamanın internet bağlantısı koptuğunda dahi son bilinen verilerle %100 erişilebilir kalması hedefini sağladım.  
 
-Bu haftaki ilerlememi detaylıca anlattığım videom şu linktedir: [VİDEO LİNKİ EKLENECEK]
+Bu haftaki ilerlememi detaylıca anlattığım videom şu linktedir: https://youtu.be/wBaV_1o7iLM
