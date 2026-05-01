@@ -64,3 +64,13 @@ Hocam, bu hafta projenin ana vaadi olan "Privacy-First" (Gizlilik Öncelikli) ci
 Bütün global state'i kaydetmek yerine katı bir veri izolasyonu uygulayarak "Whitelist" kurgusu geliştirdim. Kullanıcının portföy varlıkları ve favori seçimleri cihaz hafızasına yazılırken, API'den gelen anlık piyasa fiyatlarını (crypto slice) kalıcılık çemberinin dışında bıraktım. Bu mimari hamle, uygulamanın çevrimdışı (offline) açıldığı durumlarda eski fiyatların güncelmiş gibi gösterilmesi riskini tamamen ortadan kaldırdı. Ayrıca, uygulamanın başlatılması sırasında cihaz diskinden belleğe veri aktarımının asenkron doğasından kaynaklanabilecek UI zafiyetlerini (cüzdanın geçici olarak boş görünmesi) önlemek amacıyla arayüz yüklemesini PersistGate bileşeni ile donanımsal düzeyde kilitledim. Bu sayede uygulamanın internet bağlantısı koptuğunda dahi son bilinen verilerle %100 erişilebilir kalması hedefini sağladım.  
 
 Bu haftaki ilerlememi detaylıca anlattığım videom şu linktedir: https://youtu.be/wBaV_1o7iLM
+
+Hafta 8: Finansal Analitik Motoru ve On-Device Portföy Optimizasyonu
+
+Hocam, bu hafta SafeWealth projesini basit bir bakiye görüntüleyiciden tam teşekküllü bir analitik platforma dönüştüren "Finansal Analitik Motoru"nun geliştirmelerini tamamladım. Bulut tabanlı hesaplama yaklaşımlarını reddederek, tüm matematiksel analizlerin doğrudan cihazın yerel işlemcisi (CPU) üzerinde çalışmasını sağlayan O(N) zaman karmaşıklığına sahip izole bir motor (`utils/analytics.js`) inşa ettim.
+
+Veritabanı şemasını (Redux Store) güncelleyerek varlık modeline "Alış Maliyeti" (Buy Price) parametresini entegre ettim. Bu genişletilmiş veri yapısı sayesinde, gerçekleşmemiş Kar/Zarar (PnL) oranlarını sistemime başarıyla dahil ettim. Ayrıca, portföydeki her bir varlığın kendi yüzdesel ağırlığı ile 24 saatlik değişim oranını çaprazlayarak, tüm cüzdanın genel performansını gösteren "Ağırlıklı 24 Saatlik Portföy Volatilitesi" algoritmasını geliştirdim. 
+
+Kullanıcı deneyimini (UX) hızlandırmak adına, form üzerinden bir varlık seçildiği an API'deki güncel fiyatı asenkron olarak "Alış Maliyeti" kutusuna otomatik dolduran akıllı bir Auto-Fill mekanizması kurguladım. İşlemci donanımının ondalıklı hesaplamalardaki kronik problemi olan IEEE 754 Yüzer Nokta (Floating-Point) hatalarına karşı, verileri arayüze aktarmadan önce donanımsal düzeyde sekiz haneli bir temizleme (Formatting) filtresiyle zırhlandırdım.
+
+Bu haftaki ilerlememi detaylıca anlattığım videom şu linktedir: [Video URL eklenecek]
