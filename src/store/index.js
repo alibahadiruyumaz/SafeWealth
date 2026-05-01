@@ -10,7 +10,7 @@ import portfolioReducer from './slices/portfolioSlice';
 const persistConfig = {
   key: 'root',
   storage: AsyncStorage,
-  // DİKKAT: 'crypto' bilerek dışarıda bırakılmıştır. Eski fiyatlar persist edilmez.
+  
   whitelist: ['favorites', 'portfolio'], 
 };
 
