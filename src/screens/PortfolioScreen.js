@@ -49,8 +49,8 @@ export default function PortfolioScreen() {
       symbol: selectedCoin.symbol || 'UNK',
       amount: parseFloat(amount),
       price: parseFloat(safePrice),
-      buyPrice: parseFloat(buyPrice), // Yeni Şema Alanı
-      priceChange24h: parseFloat(change24h) // Yeni Şema Alanı
+      buyPrice: parseFloat(buyPrice), 
+      priceChange24h: parseFloat(change24h) 
     };
 
     if (isEditing) {
