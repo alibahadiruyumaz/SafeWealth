@@ -73,4 +73,4 @@ Veritabanı şemasını (Redux Store) güncelleyerek varlık modeline "Alış Ma
 
 Kullanıcı deneyimini (UX) hızlandırmak adına, form üzerinden bir varlık seçildiği an API'deki güncel fiyatı asenkron olarak "Alış Maliyeti" kutusuna otomatik dolduran akıllı bir Auto-Fill mekanizması kurguladım. İşlemci donanımının ondalıklı hesaplamalardaki kronik problemi olan IEEE 754 Yüzer Nokta (Floating-Point) hatalarına karşı, verileri arayüze aktarmadan önce donanımsal düzeyde sekiz haneli bir temizleme (Formatting) filtresiyle zırhlandırdım.
 
-Bu haftaki ilerlememi detaylıca anlattığım videom şu linktedir: [Video URL eklenecek]
+Bu haftaki ilerlememi detaylıca anlattığım videom şu linktedir: https://youtu.be/wWrvEJpzjfQ
