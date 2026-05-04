@@ -74,3 +74,13 @@ Veritabanı şemasını (Redux Store) güncelleyerek varlık modeline "Alış Ma
 Kullanıcı deneyimini (UX) hızlandırmak adına, form üzerinden bir varlık seçildiği an API'deki güncel fiyatı asenkron olarak "Alış Maliyeti" kutusuna otomatik dolduran akıllı bir Auto-Fill mekanizması kurguladım. İşlemci donanımının ondalıklı hesaplamalardaki kronik problemi olan IEEE 754 Yüzer Nokta (Floating-Point) hatalarına karşı, verileri arayüze aktarmadan önce donanımsal düzeyde sekiz haneli bir temizleme (Formatting) filtresiyle zırhlandırdım.
 
 Bu haftaki ilerlememi detaylıca anlattığım videom şu linktedir: https://youtu.be/wWrvEJpzjfQ
+
+Hafta 9: Otonom Tema Mimarisi, Donanım İvmelendirmesi ve Kurumsal Kimlik
+
+Hocam, bu hafta projenin kullanıcı deneyimini (UX) endüstri standartlarına taşımak ve donanım performansını maksimize etmek amacıyla derin mimari müdahaleleri kapsayan "UI/UX ve Performans Optimizasyonu" maddelerini tamamladım.  
+
+Uygulamanın arayüz tepkime süresini artırmak amacıyla, animasyon ve geçiş mantığını JavaScript thread'inden arındırarak useNativeDriver parametresi üzerinden doğrudan cihazın grafik işlemcisine (GPU) devrettim. Bu müdahale sayesinde, veri yoğunluklu listelerde kayıpsız 60 FPS akıcılığını güvence altına aldım. Eş zamanlı olarak, işletim sisteminin Appearance API katmanına bağlanarak uygulamanın cihazın sistem stiline (Dark/Light) otonom tepki vermesini sağlayan merkezi bir tema mimarisi kurguladım.  
+
+Kurumsal kimlik tarafında ise, projenin "TempApp" olan varsayılan ismini ve logolarını SafeWealth vizyonuna uygun profesyonel varlıklarla (assets) güncelledim. Uygulamanın açılış ekranını (Splash Screen) koyu tema vizyonuna uygun #121212 arka plan rengiyle donanımsal düzeyde yapılandırarak, kullanıcı girişindeki "flash-bang" etkisini tamamen ortadan kaldırdım. Son olarak, app.json manifest dosyası üzerinden projenin ana odağına hizmet etmeyen atıl platform (Web/Legacy) kalıntılarını temizleyerek derleme boyutunu (bundle size) optimize ettim ve sistemi 10. hafta fiziksel cihaz testlerine hazır hale getirdim.  
+
+Bu haftaki ilerlememi detaylıca anlattığım videom şu linktedir: 22290875-Ali Bahadır-Uyumaz-IOS2 Dersi-04.05.2026-V8
