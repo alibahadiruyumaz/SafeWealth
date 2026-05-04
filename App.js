@@ -1,23 +1,21 @@
 import React from 'react';
 import { Provider } from 'react-redux';
-// MİMARİ GÜNCELLEME: persistor objesini import ediyoruz
 import { store, persistor } from './src/store';
-// MİMARİ GÜNCELLEME: Asenkron I/O işlemini yönetecek kapı (Gate) bileşeni
 import { PersistGate } from 'redux-persist/integration/react';
 import { StatusBar } from 'expo-status-bar';
-
-// Güvenli alan (SafeArea) sağlayıcısı
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
-// Navigasyon importları
-import { NavigationContainer } from '@react-navigation/native';
+/**
+ * MİMARİ MÜDAHALE: Otonom Tema ve Cihaz Tercihi Entegrasyonu
+ * useColorScheme kancası ile sistem tercihlerini asenkron dinliyoruz.
+ */
+import { useColorScheme } from 'react-native'; 
+import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'; 
-
-// İkonlar için
 import { Ionicons } from '@expo/vector-icons';
 
-// Sayfalarımız
+// Ekranlar
 import Dashboard from './src/screens/Dashboard';
 import DetailScreen from './src/screens/DetailScreen';
 import PortfolioScreen from './src/screens/PortfolioScreen'; 
@@ -25,7 +23,31 @@ import PortfolioScreen from './src/screens/PortfolioScreen';
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator(); 
 
-// Piyasalar sekmesi içinde "Detay" sayfasına gidebilmek için bir Stack
+// MİMARİ TASARIM: SafeWealth Özel Renk Paletleri
+const SafeWealthLightTheme = {
+  ...DefaultTheme,
+  colors: {
+    ...DefaultTheme.colors,
+    primary: '#2196F3',
+    background: '#FFFFFF',
+    card: '#F8F9FA',
+    text: '#121212',
+    border: '#E0E0E0',
+  },
+};
+
+const SafeWealthDarkTheme = {
+  ...DarkTheme,
+  colors: {
+    ...DarkTheme.colors,
+    primary: '#2196F3',
+    background: '#121212',
+    card: '#1E1E1E',
+    text: '#FFFFFF',
+    border: '#333333',
+  },
+};
+
 function MarketStack() {
   return (
     <Stack.Navigator>
@@ -40,8 +62,6 @@ function MarketStack() {
         options={{ 
           title: 'Varlık Detayı',
           headerBackTitle: 'Geri',
-          headerTintColor: '#121212',
-          headerTitleStyle: { fontWeight: 'bold' }
         }} 
       />
     </Stack.Navigator>
@@ -49,33 +69,32 @@ function MarketStack() {
 }
 
 export default function App() {
+  const scheme = useColorScheme(); // Cihazın Appearance (Görünüm) tercihini dinle
+
   return (
     <Provider store={store}>
-      {/* 
-        MİMARİ KİLİT NOKTA: PersistGate 
-        Cihaz hafızasındaki (AsyncStorage) veriler Redux'a yüklenene kadar UI bloke edilir.
-        'loading={null}' yerine ileride projenin kurumsal renklerine uygun bir Splash ekranı da eklenebilir.
-      */}
       <PersistGate loading={null} persistor={persistor}>
         <SafeAreaProvider>
-          <NavigationContainer>
-            {/* Ana Navigatörümüz artık Tab (Alt Menü) */}
+          {/* MİMARİ KİLİT: NavigationContainer seviyesinde otonom tema enjeksiyonu */}
+          <NavigationContainer theme={scheme === 'dark' ? SafeWealthDarkTheme : SafeWealthLightTheme}>
             <Tab.Navigator
               screenOptions={({ route }) => ({
                 tabBarIcon: ({ focused, color, size }) => {
                   let iconName;
-
                   if (route.name === 'Piyasalar') {
                     iconName = focused ? 'stats-chart' : 'stats-chart-outline';
                   } else if (route.name === 'Cüzdanım') {
                     iconName = focused ? 'wallet' : 'wallet-outline';
                   }
-
                   return <Ionicons name={iconName} size={size} color={color} />;
                 },
                 tabBarActiveTintColor: '#2196F3',
                 tabBarInactiveTintColor: 'gray',
-                headerShown: false, // Üstte Tab'ın kendi başlığını kapatıyoruz
+                headerShown: false,
+                tabBarStyle: {
+                   backgroundColor: scheme === 'dark' ? '#1E1E1E' : '#FFFFFF',
+                   borderTopColor: scheme === 'dark' ? '#333333' : '#E0E0E0'
+                }
               })}
             >
               <Tab.Screen name="Piyasalar" component={MarketStack} />
@@ -84,7 +103,7 @@ export default function App() {
           </NavigationContainer>
         </SafeAreaProvider>
       </PersistGate>
-      <StatusBar style="auto" />
+      <StatusBar style={scheme === 'dark' ? 'light' : 'dark'} />
     </Provider>
   );
 }
