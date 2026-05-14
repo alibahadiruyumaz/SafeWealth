@@ -83,5 +83,5 @@ Uygulamanın arayüz tepkime süresini artırmak amacıyla, animasyon ve geçiş
 
 Kurumsal kimlik tarafında ise, projenin "TempApp" olan varsayılan ismini ve logolarını SafeWealth vizyonuna uygun profesyonel varlıklarla (assets) güncelledim. Uygulamanın açılış ekranını (Splash Screen) koyu tema vizyonuna uygun #121212 arka plan rengiyle donanımsal düzeyde yapılandırarak, kullanıcı girişindeki "flash-bang" etkisini tamamen ortadan kaldırdım. Son olarak, app.json manifest dosyası üzerinden projenin ana odağına hizmet etmeyen atıl platform (Web/Legacy) kalıntılarını temizleyerek derleme boyutunu (bundle size) optimize ettim ve sistemi 10. hafta fiziksel cihaz testlerine hazır hale getirdim.  
 
-Bu haftaki ilerlememi detaylıca anlattığım videom şu linktedir: Video Lİnki Buraya eklenecek
+Bu haftaki ilerlememi detaylıca anlattığım videom şu linktedir: https://youtu.be/2c7wGOlOROY
 
