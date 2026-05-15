@@ -85,3 +85,12 @@ Kurumsal kimlik tarafında ise, projenin "TempApp" olan varsayılan ismini ve lo
 
 Bu haftaki ilerlememi detaylıca anlattığım videom şu linktedir: https://youtu.be/2c7wGOlOROY
 
+Hafta 10: Fiziksel Donanım Testleri, Biyometrik Güvenlik ve UI/UX Cilası
+
+Hocam, bu hafta 10. hafta yönergeleri doğrultusunda asenkron süreç yönetimlerini ve fiziksel cihaz testlerini (debugging) tamamlayarak uygulamayı "Production-Ready" (canlı ortama hazır) seviyesine taşıdım.
+
+Projenin "Privacy-First" vizyonuna uygun olarak, expo-local-authentication altyapısı kullanılarak uygulamaya FaceID ve TouchID destekli biyometrik güvenlik duvarı entegre edildi. Bununla birlikte, fiziksel donanım testleri kapsamında arayüze "Pull-to-Refresh" (aşağı çekerek yenileme) özelliği kazandırıldı. Bu süreçte Redux Thunk üzerinde karşılaşılan asenkron darboğazlar .unwrap yönetimiyle çözülerek olası bellek sızıntılarının (Memory Leak) önüne geçildi.
+
+Kullanıcı deneyimini iyileştirmek ve performansı artırmak adına, API limitlerine takılmamak için doğrudan Redux State üzerinde çalışan, sıfır gecikmeli yerel arama motoru (Local Search) ve "Tümü / Favorilerim" filtreleme sistemi geliştirildi. Son olarak, portföyün boş olduğu veya arama sonuçlarının bulunamadığı senaryolarda ekranın anlamsız kalmasını engellemek için, uygulamanın otonom temasıyla tam uyumlu kurumsal Empty State (Boş Durum) tasarımları sisteme dahil edildi.
+
+Bu haftaki donanım testlerimi ve geliştirmelerimi detaylıca anlattığım videom şu linktedir: [YouTube Linkinizi Buraya Ekleyin]
