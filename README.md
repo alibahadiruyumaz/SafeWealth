@@ -74,3 +74,23 @@ Veritabanı şemasını (Redux Store) güncelleyerek varlık modeline "Alış Ma
 Kullanıcı deneyimini (UX) hızlandırmak adına, form üzerinden bir varlık seçildiği an API'deki güncel fiyatı asenkron olarak "Alış Maliyeti" kutusuna otomatik dolduran akıllı bir Auto-Fill mekanizması kurguladım. İşlemci donanımının ondalıklı hesaplamalardaki kronik problemi olan IEEE 754 Yüzer Nokta (Floating-Point) hatalarına karşı, verileri arayüze aktarmadan önce donanımsal düzeyde sekiz haneli bir temizleme (Formatting) filtresiyle zırhlandırdım.
 
 Bu haftaki ilerlememi detaylıca anlattığım videom şu linktedir: https://youtu.be/wWrvEJpzjfQ
+
+Hafta 9: Otonom Tema Mimarisi, Donanım İvmelendirmesi ve Kurumsal Kimlik
+
+Hocam, bu hafta projenin kullanıcı deneyimini (UX) endüstri standartlarına taşımak ve donanım performansını maksimize etmek amacıyla derin mimari müdahaleleri kapsayan "UI/UX ve Performans Optimizasyonu" maddelerini tamamladım.  
+
+Uygulamanın arayüz tepkime süresini artırmak amacıyla, animasyon ve geçiş mantığını JavaScript thread'inden arındırarak useNativeDriver parametresi üzerinden doğrudan cihazın grafik işlemcisine (GPU) devrettim. Bu müdahale sayesinde, veri yoğunluklu listelerde kayıpsız 60 FPS akıcılığını güvence altına aldım. Eş zamanlı olarak, işletim sisteminin Appearance API katmanına bağlanarak uygulamanın cihazın sistem stiline (Dark/Light) otonom tepki vermesini sağlayan merkezi bir tema mimarisi kurguladım.  
+
+Kurumsal kimlik tarafında ise, projenin "TempApp" olan varsayılan ismini ve logolarını SafeWealth vizyonuna uygun profesyonel varlıklarla (assets) güncelledim. Uygulamanın açılış ekranını (Splash Screen) koyu tema vizyonuna uygun #121212 arka plan rengiyle donanımsal düzeyde yapılandırarak, kullanıcı girişindeki "flash-bang" etkisini tamamen ortadan kaldırdım. Son olarak, app.json manifest dosyası üzerinden projenin ana odağına hizmet etmeyen atıl platform (Web/Legacy) kalıntılarını temizleyerek derleme boyutunu (bundle size) optimize ettim ve sistemi 10. hafta fiziksel cihaz testlerine hazır hale getirdim.  
+
+Bu haftaki ilerlememi detaylıca anlattığım videom şu linktedir: https://youtu.be/2c7wGOlOROY
+
+Hafta 10: Fiziksel Donanım Testleri, Biyometrik Güvenlik ve UI/UX Cilası
+
+Hocam, bu hafta 10. hafta yönergeleri doğrultusunda asenkron süreç yönetimlerini ve fiziksel cihaz testlerini (debugging) tamamlayarak uygulamayı "Production-Ready" (canlı ortama hazır) seviyesine taşıdım.
+
+Projenin "Privacy-First" vizyonuna uygun olarak, expo-local-authentication altyapısı kullanılarak uygulamaya FaceID ve TouchID destekli biyometrik güvenlik duvarı entegre edildi. Bununla birlikte, fiziksel donanım testleri kapsamında arayüze "Pull-to-Refresh" (aşağı çekerek yenileme) özelliği kazandırıldı. Bu süreçte Redux Thunk üzerinde karşılaşılan asenkron darboğazlar .unwrap yönetimiyle çözülerek olası bellek sızıntılarının (Memory Leak) önüne geçildi.
+
+Kullanıcı deneyimini iyileştirmek ve performansı artırmak adına, API limitlerine takılmamak için doğrudan Redux State üzerinde çalışan, sıfır gecikmeli yerel arama motoru (Local Search) ve "Tümü / Favorilerim" filtreleme sistemi geliştirildi. Son olarak, portföyün boş olduğu veya arama sonuçlarının bulunamadığı senaryolarda ekranın anlamsız kalmasını engellemek için, uygulamanın otonom temasıyla tam uyumlu kurumsal Empty State (Boş Durum) tasarımları sisteme dahil edildi.
+
+Bu haftaki donanım testlerimi ve geliştirmelerimi detaylıca anlattığım videom şu linktedir: [YouTube Linkinizi Buraya Ekleyin]
