@@ -8,7 +8,6 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { addAsset, deleteAsset, updateAsset } from '../store/slices/portfolioSlice';
 import { PieChart } from 'react-native-chart-kit';
 import { Ionicons } from '@expo/vector-icons';
-import { calculatePortfolioAnalytics } from '../utils/analytics';
 import { useTheme } from '@react-navigation/native'; // MİMARİ: Otonom Tema Entegrasyonu
 
 const screenWidth = Dimensions.get('window').width;
@@ -113,7 +112,60 @@ export default function PortfolioScreen() {
     setSelectedCoin(null); setAmount(''); setBuyPrice(''); setIsEditing(false);
   };
 
-  const analytics = useMemo(() => calculatePortfolioAnalytics(assets), [assets]);
+  // MİMARİ MÜDAHALE: Canlı API fiyatları ile Cüzdan maliyetlerini karşılaştıran PnL Motoru
+  const analytics = useMemo(() => {
+    let totalPortfolioValue = 0;
+    let totalPortfolioBuyValue = 0;
+    let weightedChangeSum = 0;
+
+    const processedAssets = assets.map(asset => {
+      // 1. Cüzdandaki coini, canlı API listesinde bul (Fiyatı güncellemek için)
+      const liveCoin = cryptoList.find(c => c.id === asset.id);
+      const livePrice = liveCoin ? liveCoin.current_price : (asset.price || 0);
+      const change24h = liveCoin ? liveCoin.price_change_percentage_24h : (asset.priceChange24h || 0);
+      
+      // 2. Güncel değer ve Kar/Zarar hesaplaması
+      const currentValue = asset.amount * livePrice;
+      const buyValue = asset.amount * (asset.buyPrice || livePrice);
+      const pnlValue = currentValue - buyValue;
+
+      totalPortfolioValue += currentValue;
+      totalPortfolioBuyValue += buyValue;
+      weightedChangeSum += (currentValue * change24h);
+
+      return {
+        ...asset,
+        currentPrice: livePrice,
+        totalValue: currentValue,
+        pnlValue: pnlValue,
+      };
+    });
+
+    // 3. Portföy ağırlıklarını hesapla
+    processedAssets.forEach(asset => {
+      asset.weightPercentage = totalPortfolioValue > 0 
+        ? ((asset.totalValue / totalPortfolioValue) * 100).toFixed(2) 
+        : "0.00";
+    });
+
+    // 4. Genel toplamları ve yüzdeleri formatla
+    const totalPnL = totalPortfolioValue - totalPortfolioBuyValue;
+    const pnlPercentage = totalPortfolioBuyValue > 0 
+      ? ((totalPnL / totalPortfolioBuyValue) * 100).toFixed(2) 
+      : "0.00";
+      
+    const weighted24hChange = totalPortfolioValue > 0 
+      ? (weightedChangeSum / totalPortfolioValue).toFixed(2) 
+      : "0.00";
+
+    return {
+      totalValue: totalPortfolioValue,
+      totalPnL: totalPnL,
+      pnlPercentage: pnlPercentage,
+      weighted24hChange: weighted24hChange,
+      processedAssets: processedAssets
+    };
+  }, [assets, cryptoList]);
 
   const chartData = useMemo(() => {
     const validAssets = analytics.processedAssets.filter(item => item.totalValue > 0 && !isNaN(item.totalValue));
@@ -126,76 +178,102 @@ export default function PortfolioScreen() {
     }));
   }, [analytics.processedAssets, theme]);
 
+  // Cüzdan boş mu dolu mu kontrolü
+  const isPortfolioEmpty = analytics.processedAssets.length === 0;
+
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
       <Text style={[styles.title, { color: theme.colors.text }]}>Analitik Dashboard</Text>
 
-      {/* KAR/ZARAR VE VOLATİLİTE KARTI - Otonom Renkler */}
-      <View style={[styles.summaryCard, { backgroundColor: theme.colors.card, borderColor: theme.colors.border, borderWidth: 1 }]}>
-        <Text style={[styles.summaryTitle, { color: theme.colors.text, opacity: 0.7 }]}>Toplam Portföy Değeri</Text>
-        <Text style={[styles.summaryValue, { color: theme.colors.text }]}>
-          ${analytics.totalValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-        </Text>
-        <View style={[styles.metricsRow, { borderTopColor: theme.colors.border }]}>
-          <View style={styles.metricBox}>
-            <Text style={[styles.metricLabel, { color: theme.colors.text, opacity: 0.7 }]}>24s Değişim</Text>
-            <Text style={[styles.metricData, { color: analytics.weighted24hChange >= 0 ? '#4CAF50' : '#FF5252' }]}>
-              {analytics.weighted24hChange >= 0 ? '+' : ''}{analytics.weighted24hChange}%
+      {/* PORTFÖY DOLUYSA GÖSTERİLECEK BÖLÜM (Grafik ve Kartlar) */}
+      {!isPortfolioEmpty ? (
+        <>
+          {/* KAR/ZARAR VE VOLATİLİTE KARTI */}
+          <View style={[styles.summaryCard, { backgroundColor: theme.colors.card, borderColor: theme.colors.border, borderWidth: 1 }]}>
+            <Text style={[styles.summaryTitle, { color: theme.colors.text, opacity: 0.7 }]}>Toplam Portföy Değeri</Text>
+            <Text style={[styles.summaryValue, { color: theme.colors.text }]}>
+              ${analytics.totalValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </Text>
+            <View style={[styles.metricsRow, { borderTopColor: theme.colors.border }]}>
+              <View style={styles.metricBox}>
+                <Text style={[styles.metricLabel, { color: theme.colors.text, opacity: 0.7 }]}>24s Değişim</Text>
+                <Text style={[styles.metricData, { color: analytics.weighted24hChange >= 0 ? '#4CAF50' : '#FF5252' }]}>
+                  {analytics.weighted24hChange >= 0 ? '+' : ''}{analytics.weighted24hChange}%
+                </Text>
+              </View>
+              <View style={styles.metricBox}>
+                <Text style={[styles.metricLabel, { color: theme.colors.text, opacity: 0.7 }]}>Toplam PnL</Text>
+                <Text style={[styles.metricData, { color: analytics.totalPnL >= 0 ? '#4CAF50' : '#FF5252' }]}>
+                  {analytics.totalPnL >= 0 ? '+' : '-'}${Math.abs(analytics.totalPnL).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ({analytics.pnlPercentage}%)
+                </Text>
+              </View>
+            </View>
           </View>
-          <View style={styles.metricBox}>
-            <Text style={[styles.metricLabel, { color: theme.colors.text, opacity: 0.7 }]}>Toplam PnL</Text>
-            <Text style={[styles.metricData, { color: analytics.totalPnL >= 0 ? '#4CAF50' : '#FF5252' }]}>
-              {analytics.totalPnL >= 0 ? '+' : '-'}${Math.abs(analytics.totalPnL).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ({analytics.pnlPercentage}%)
-            </Text>
-          </View>
-        </View>
-      </View>
 
-      {chartData && chartData.length > 0 ? (
-        <PieChart
-          data={chartData}
-          width={screenWidth - 20}
-          height={180}
-          chartConfig={{ color: () => theme.colors.text }} // Tema entegrasyonu
-          accessor={"population"}
-          backgroundColor={"transparent"}
-          paddingLeft={"15"}
-          absolute
-        />
+          {chartData && chartData.length > 0 && (
+            <PieChart
+              data={chartData}
+              width={screenWidth - 20}
+              height={180}
+              chartConfig={{ color: () => theme.colors.text }} // Tema entegrasyonu
+              accessor={"population"}
+              backgroundColor={"transparent"}
+              paddingLeft={"15"}
+              absolute
+            />
+          )}
+
+          {/* GPU İvmelendirmeli Liste */}
+          <FlatList
+            data={analytics.processedAssets}
+            keyExtractor={(item) => item.id}
+            contentContainerStyle={{ paddingBottom: 100 }}
+            renderItem={({ item, index }) => (
+              <PortfolioItem 
+                item={item} 
+                index={index} 
+                theme={theme}
+                onDelete={(id) => dispatch(deleteAsset(id))}
+                onEdit={(asset) => {
+                  setSelectedCoin(asset);
+                  setAmount(asset.amount.toString());
+                  setBuyPrice(asset.buyPrice ? asset.buyPrice.toString() : '');
+                  setIsEditing(true);
+                  setModalVisible(true);
+                }}
+              />
+            )}
+          />
+        </>
       ) : (
-        <View style={styles.emptyContainer}>
-          <Ionicons name="analytics-outline" size={64} color={theme.colors.border} />
-          <Text style={[styles.emptyText, { color: theme.colors.text }]}>Veri Bulunamadı</Text>
+        /* PORTFÖY BOŞSA GÖSTERİLECEK ŞIK EMPTY STATE TASARIMI */
+        <View style={styles.emptyStateWrapper}>
+          <View style={[styles.iconCircle, { backgroundColor: theme.colors.card }]}>
+            <Ionicons name="wallet-outline" size={80} color={theme.colors.primary} />
+          </View>
+          <Text style={[styles.emptyTitle, { color: theme.colors.text }]}>Portföyünüz Boş</Text>
+          <Text style={[styles.emptySubtitle, { color: theme.colors.text }]}>
+            Henüz hiçbir varlık eklemediniz. Yatırımlarınızı anlık takip etmek ve analitik verilere ulaşmak için hemen ilk kripto varlığınızı kaydedin.
+          </Text>
+          
+          <TouchableOpacity 
+            style={[styles.emptyStateButton, { backgroundColor: theme.colors.primary }]} 
+            onPress={() => { resetForm(); setModalVisible(true); }}
+            activeOpacity={0.8}
+          >
+            <Ionicons name="rocket-outline" size={22} color="#FFF" style={{ marginRight: 8 }} />
+            <Text style={styles.emptyStateButtonText}>İlk Varlığını Ekle</Text>
+          </TouchableOpacity>
         </View>
       )}
 
-      {/* GPU İvmelendirmeli Liste */}
-      <FlatList
-        data={analytics.processedAssets}
-        keyExtractor={(item) => item.id}
-        contentContainerStyle={{ paddingBottom: 100 }}
-        renderItem={({ item, index }) => (
-          <PortfolioItem 
-            item={item} 
-            index={index} 
-            theme={theme}
-            onDelete={(id) => dispatch(deleteAsset(id))}
-            onEdit={(asset) => {
-              setSelectedCoin(asset);
-              setAmount(asset.amount.toString());
-              setBuyPrice(asset.buyPrice ? asset.buyPrice.toString() : '');
-              setIsEditing(true);
-              setModalVisible(true);
-            }}
-          />
-        )}
-      />
-
-      <TouchableOpacity style={[styles.addButton, { backgroundColor: theme.colors.primary }]} onPress={() => { resetForm(); setModalVisible(true); }}>
-        <Ionicons name="add" size={24} color="#FFF" />
-        <Text style={styles.addButtonText}>Yeni Varlık Ekle</Text>
-      </TouchableOpacity>
+      {/* SADECE LİSTE DOLUYSA GÖRÜNECEK SABİT EKLEME BUTONU */}
+      {!isPortfolioEmpty && (
+        <TouchableOpacity style={[styles.addButton, { backgroundColor: theme.colors.primary }]} onPress={() => { resetForm(); setModalVisible(true); }}>
+          <Ionicons name="add" size={24} color="#FFF" />
+          <Text style={styles.addButtonText}>Yeni Varlık Ekle</Text>
+        </TouchableOpacity>
+      )}
 
       {/* Temaya Duyarlı Modal */}
       <Modal visible={modalVisible} animationType="slide" transparent={false}>
@@ -292,6 +370,12 @@ const styles = StyleSheet.create({
   saveButtonText: { color: '#FFF', fontWeight: 'bold', fontSize: 18 },
   coinOption: { paddingHorizontal: 20, paddingVertical: 12, borderWidth: 1.5, borderRadius: 10, marginRight: 10, height: 50, justifyContent: 'center' },
   coinSymbol: { fontWeight: '600' },
-  emptyContainer: { height: 200, justifyContent: 'center', alignItems: 'center' },
-  emptyText: { fontSize: 20, fontWeight: '800', marginTop: 15 }
+  
+  /* Cüzdan Boş Durumu (Empty State) Stilleri */
+  emptyStateWrapper: { flex: 1, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 30, paddingBottom: 50 },
+  iconCircle: { width: 120, height: 120, borderRadius: 60, justifyContent: 'center', alignItems: 'center', marginBottom: 25, shadowColor: "#000", shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.1, shadowRadius: 10, elevation: 5 },
+  emptyTitle: { fontSize: 26, fontWeight: '800', marginBottom: 15, textAlign: 'center' },
+  emptySubtitle: { fontSize: 16, textAlign: 'center', opacity: 0.7, lineHeight: 24, marginBottom: 40 },
+  emptyStateButton: { flexDirection: 'row', paddingVertical: 16, paddingHorizontal: 30, borderRadius: 14, alignItems: 'center', justifyContent: 'center', shadowColor: "#000", shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 5, elevation: 6 },
+  emptyStateButtonText: { color: '#FFF', fontSize: 18, fontWeight: '700' }
 });

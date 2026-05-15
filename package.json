@@ -1,5 +1,5 @@
 {
-  "name": "tempapp",
+  "name": "safewealth",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
@@ -17,6 +17,7 @@
     "axios": "^1.13.6",
     "babel-preset-expo": "~54.0.10",
     "expo": "~54.0.6",
+    "expo-local-authentication": "~17.0.8",
     "expo-status-bar": "~3.0.9",
     "react": "19.1.0",
     "react-native": "0.81.5",

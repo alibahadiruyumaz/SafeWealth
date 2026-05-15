@@ -15,10 +15,11 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'; 
 import { Ionicons } from '@expo/vector-icons';
 
-// Ekranlar
+// Ekranlar ve Güvenlik Bileşeni
 import Dashboard from './src/screens/Dashboard';
 import DetailScreen from './src/screens/DetailScreen';
 import PortfolioScreen from './src/screens/PortfolioScreen'; 
+import SecurityWrapper from './src/components/SecurityWrapper'; // YENİ: Güvenlik Kalkanı Importu
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator(); 
@@ -75,32 +76,35 @@ export default function App() {
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
         <SafeAreaProvider>
-          {/* MİMARİ KİLİT: NavigationContainer seviyesinde otonom tema enjeksiyonu */}
-          <NavigationContainer theme={scheme === 'dark' ? SafeWealthDarkTheme : SafeWealthLightTheme}>
-            <Tab.Navigator
-              screenOptions={({ route }) => ({
-                tabBarIcon: ({ focused, color, size }) => {
-                  let iconName;
-                  if (route.name === 'Piyasalar') {
-                    iconName = focused ? 'stats-chart' : 'stats-chart-outline';
-                  } else if (route.name === 'Cüzdanım') {
-                    iconName = focused ? 'wallet' : 'wallet-outline';
+          {/* MİMARİ KİLİT 1: Uygulamayı yetkisiz erişimden koruyan Donanımsal Biyometrik Kalkan */}
+          <SecurityWrapper>
+            {/* MİMARİ KİLİT 2: NavigationContainer seviyesinde otonom tema enjeksiyonu */}
+            <NavigationContainer theme={scheme === 'dark' ? SafeWealthDarkTheme : SafeWealthLightTheme}>
+              <Tab.Navigator
+                screenOptions={({ route }) => ({
+                  tabBarIcon: ({ focused, color, size }) => {
+                    let iconName;
+                    if (route.name === 'Piyasalar') {
+                      iconName = focused ? 'stats-chart' : 'stats-chart-outline';
+                    } else if (route.name === 'Cüzdanım') {
+                      iconName = focused ? 'wallet' : 'wallet-outline';
+                    }
+                    return <Ionicons name={iconName} size={size} color={color} />;
+                  },
+                  tabBarActiveTintColor: '#2196F3',
+                  tabBarInactiveTintColor: 'gray',
+                  headerShown: false,
+                  tabBarStyle: {
+                     backgroundColor: scheme === 'dark' ? '#1E1E1E' : '#FFFFFF',
+                     borderTopColor: scheme === 'dark' ? '#333333' : '#E0E0E0'
                   }
-                  return <Ionicons name={iconName} size={size} color={color} />;
-                },
-                tabBarActiveTintColor: '#2196F3',
-                tabBarInactiveTintColor: 'gray',
-                headerShown: false,
-                tabBarStyle: {
-                   backgroundColor: scheme === 'dark' ? '#1E1E1E' : '#FFFFFF',
-                   borderTopColor: scheme === 'dark' ? '#333333' : '#E0E0E0'
-                }
-              })}
-            >
-              <Tab.Screen name="Piyasalar" component={MarketStack} />
-              <Tab.Screen name="Cüzdanım" component={PortfolioScreen} />
-            </Tab.Navigator>
-          </NavigationContainer>
+                })}
+              >
+                <Tab.Screen name="Piyasalar" component={MarketStack} />
+                <Tab.Screen name="Cüzdanım" component={PortfolioScreen} />
+              </Tab.Navigator>
+            </NavigationContainer>
+          </SecurityWrapper>
         </SafeAreaProvider>
       </PersistGate>
       <StatusBar style={scheme === 'dark' ? 'light' : 'dark'} />
