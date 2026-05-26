@@ -93,4 +93,4 @@ Projenin "Privacy-First" vizyonuna uygun olarak, expo-local-authentication altya
 
 Kullanıcı deneyimini iyileştirmek ve performansı artırmak adına, API limitlerine takılmamak için doğrudan Redux State üzerinde çalışan, sıfır gecikmeli yerel arama motoru (Local Search) ve "Tümü / Favorilerim" filtreleme sistemi geliştirildi. Son olarak, portföyün boş olduğu veya arama sonuçlarının bulunamadığı senaryolarda ekranın anlamsız kalmasını engellemek için, uygulamanın otonom temasıyla tam uyumlu kurumsal Empty State (Boş Durum) tasarımları sisteme dahil edildi.
 
-Bu haftaki donanım testlerimi ve geliştirmelerimi detaylıca anlattığım videom şu linktedir: [YouTube Linkinizi Buraya Ekleyin]
+Bu haftaki donanım testlerimi ve geliştirmelerimi detaylıca anlattığım videom şu linktedir: https://youtu.be/b11EW-K6D2E
