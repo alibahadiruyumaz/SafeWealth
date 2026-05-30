@@ -15,7 +15,10 @@ Uygulamanın 11. Hafta (Final) derlemesini Android cihazınıza kurmak için aş
 
 [📱 APK Dosyasını İndir (v1.0.0)] 
 
-(Buraya da kendi oluşturduğun kalıcı QR kodun görselini ekle)
+https://github.com/alibahadiruyumaz/SafeWealth/releases/download/v1.0.0/SafeWealth.apk
+
+<img width="3000" height="3000" alt="https_github_com_alibahadiruyumaz_SafeWealth_releases_download_v1_0_0_SafeWealth_apk" src="https://github.com/user-attachments/assets/48b9b766-b984-43f2-a016-a7cdf69edcbd" />
+
 
 ---
 
