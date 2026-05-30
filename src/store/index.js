@@ -5,19 +5,22 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import cryptoReducer from './slices/cryptoSlice';
 import favoritesReducer from './slices/favoritesSlice';
 import portfolioReducer from './slices/portfolioSlice';
+import settingsReducer from './slices/settingsSlice'; // YENİ EKLENDİ: Ayarlar Slice'ı
 
 // MİMARİ KARAR: Sadece yerelde kalması gereken kullanıcı verilerini seçiyoruz.
 const persistConfig = {
   key: 'root',
   storage: AsyncStorage,
   
-  whitelist: ['favorites', 'portfolio'], 
+  // YENİ EKLENDİ: 'settings' buraya eklendi ki titreşim tercihi cihaz hafızasında kalıcı olsun
+  whitelist: ['favorites', 'portfolio', 'settings'], 
 };
 
 const rootReducer = combineReducers({
   crypto: cryptoReducer,
   favorites: favoritesReducer,
   portfolio: portfolioReducer,
+  settings: settingsReducer, // YENİ EKLENDİ: Ayarlar Reducer'ı
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

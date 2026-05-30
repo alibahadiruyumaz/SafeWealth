@@ -22,6 +22,11 @@
         "foregroundImage": "./assets/icon.png"
       },
       "package": "com.alibahadir.safewealth"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "99ade174-66b3-4d5f-8d3d-145f5f289822"
+      }
     }
   }
 }

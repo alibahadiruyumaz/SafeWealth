@@ -15,7 +15,7 @@ export default function SecurityWrapper({ children }) {
 
       if (compatible && enrolled) {
         setIsSupported(true);
-        // Kontrol bittiği saniye beklemeden şifre/parmak izi sor (Hızlandırma Yapıldı)
+        // Kontrol bittiğinde şifre/parmak izi sor 
         const result = await LocalAuthentication.authenticateAsync({
           promptMessage: 'SafeWealth Portföyüne Giriş',
           fallbackLabel: 'Şifre Kullan',

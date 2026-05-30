@@ -5,11 +5,13 @@ import { fetchCryptoData } from '../store/slices/cryptoSlice';
 import { useNavigation, useTheme } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import * as Haptics from 'expo-haptics'; 
 
 /**
  * MİMARİ MÜDAHALE: Native Driver Destekli Liste Elemanı
  */
-const CryptoListItem = React.memo(({ item, index, theme }) => {
+// YENİ: isHapticEnabled prop'u eklendi
+const CryptoListItem = React.memo(({ item, index, theme, isHapticEnabled }) => {
   const navigation = useNavigation();
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
@@ -35,7 +37,10 @@ const CryptoListItem = React.memo(({ item, index, theme }) => {
       <TouchableOpacity 
         style={[styles.itemContainer, { borderBottomColor: theme.colors.border }]}
         activeOpacity={0.7}
-        onPress={() => navigation.navigate('Detail', { coinId: item.id, coinName: item.name })}
+        onPress={() => {
+          if (isHapticEnabled) Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); // KORUMA EKLENDİ
+          navigation.navigate('Detail', { coinId: item.id, coinName: item.name });
+        }}
       >
         <View style={styles.nameContainer}>
           <Text style={[styles.coinName, { color: theme.colors.text }]} numberOfLines={1}>{item.name}</Text>
@@ -57,12 +62,14 @@ export default function Dashboard() {
   const theme = useTheme(); 
   
   const { data, status, error } = useSelector((state) => state.crypto);
-  // Redux'tan favori coin ID'lerini çekiyoruz
   const favorites = useSelector((state) => state.favorites?.items || []); 
+  
+  // YENİ: Global Haptic ayarını Redux'tan çekiyoruz
+  const { isHapticEnabled } = useSelector((state) => state.settings);
 
   const [refreshing, setRefreshing] = useState(false);
   const [searchQuery, setSearchQuery] = useState(''); 
-  const [showFavoritesOnly, setShowFavoritesOnly] = useState(false); // YENİ: Favori filtresi state'i
+  const [showFavoritesOnly, setShowFavoritesOnly] = useState(false); 
 
   useEffect(() => {
     if (status === 'idle') {
@@ -72,16 +79,19 @@ export default function Dashboard() {
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true); 
+    if (isHapticEnabled) Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); // KORUMA EKLENDİ
+    
     try {
       await dispatch(fetchCryptoData()).unwrap(); 
+      if (isHapticEnabled) Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success); // KORUMA EKLENDİ
     } catch (err) {
       console.error("Senkronizasyon hatası:", err);
+      if (isHapticEnabled) Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error); // KORUMA EKLENDİ
     } finally {
       setRefreshing(false); 
     }
-  }, [dispatch]);
+  }, [dispatch, isHapticEnabled]);
 
-  // YENİ: Hem arama kelimesine hem de Favori durumuna göre 2 katmanlı filtreleme
   const filteredData = useMemo(() => {
     return data.filter(coin => {
       const matchesSearch = coin.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
@@ -93,10 +103,9 @@ export default function Dashboard() {
   }, [data, searchQuery, showFavoritesOnly, favorites]);
 
   const renderItem = useCallback(({ item, index }) => (
-    <CryptoListItem item={item} index={index} theme={theme} />
-  ), [theme]);
+    <CryptoListItem item={item} index={index} theme={theme} isHapticEnabled={isHapticEnabled} /> // YENİ: Prop olarak aktarıldı
+  ), [theme, isHapticEnabled]);
 
-  // YENİ: Dinamik Boş Durum (Empty State) Yönetimi
   const renderEmptyState = () => {
     if (showFavoritesOnly && favorites.length === 0) {
       return (
@@ -147,7 +156,6 @@ export default function Dashboard() {
       </View>
 
       <View style={[styles.searchWrapper, { backgroundColor: theme.colors.background }]}>
-        {/* Arama Çubuğu */}
         <View style={[styles.searchBar, { backgroundColor: theme.colors.card, borderColor: theme.colors.border }]}>
           <Ionicons name="search" size={20} color={theme.colors.text} style={{ opacity: 0.5 }} />
           <TextInput
@@ -165,18 +173,23 @@ export default function Dashboard() {
           )}
         </View>
 
-        {/* YENİ: Tümü / Favorilerim Filtre Butonları */}
         <View style={styles.filterRow}>
           <TouchableOpacity 
             style={[styles.filterBtn, !showFavoritesOnly && { backgroundColor: theme.colors.primary }]} 
-            onPress={() => setShowFavoritesOnly(false)}
+            onPress={() => {
+              if (showFavoritesOnly && isHapticEnabled) Haptics.selectionAsync(); // KORUMA EKLENDİ
+              setShowFavoritesOnly(false);
+            }}
           >
             <Text style={[styles.filterBtnText, { color: !showFavoritesOnly ? '#FFF' : theme.colors.text }]}>Tümü</Text>
           </TouchableOpacity>
           
           <TouchableOpacity 
             style={[styles.filterBtn, showFavoritesOnly && { backgroundColor: theme.colors.primary }]} 
-            onPress={() => setShowFavoritesOnly(true)}
+            onPress={() => {
+              if (!showFavoritesOnly && isHapticEnabled) Haptics.selectionAsync(); // KORUMA EKLENDİ
+              setShowFavoritesOnly(true);
+            }}
           >
             <Ionicons name="star" size={14} color={showFavoritesOnly ? '#FFF' : theme.colors.text} style={{ marginRight: 6 }} />
             <Text style={[styles.filterBtnText, { color: showFavoritesOnly ? '#FFF' : theme.colors.text }]}>Favorilerim</Text>
@@ -220,7 +233,6 @@ const styles = StyleSheet.create({
   searchBar: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 15, height: 45, borderRadius: 12, borderWidth: 1 },
   searchInput: { flex: 1, marginLeft: 10, fontSize: 15, fontWeight: '500' },
   
-  /* Filtre Buton Stilleri  */
   filterRow: { 
     flexDirection: 'row', 
     marginTop: 12, 

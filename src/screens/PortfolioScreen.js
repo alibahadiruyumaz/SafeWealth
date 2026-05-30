@@ -8,14 +8,12 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { addAsset, deleteAsset, updateAsset } from '../store/slices/portfolioSlice';
 import { PieChart } from 'react-native-chart-kit';
 import { Ionicons } from '@expo/vector-icons';
-import { useTheme } from '@react-navigation/native'; // MİMARİ: Otonom Tema Entegrasyonu
+import { useTheme, useNavigation } from '@react-navigation/native';
+import * as Haptics from 'expo-haptics';
 
 const screenWidth = Dimensions.get('window').width;
 
-/**
- * MİMARİ MÜDAHALE: Native Driver Destekli ve Temaya Duyarlı Liste Elemanı
- */
-const PortfolioItem = React.memo(({ item, index, theme, onEdit, onDelete }) => {
+const PortfolioItem = React.memo(({ item, index, theme, onEdit, onDelete, isHapticEnabled }) => {
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
@@ -23,7 +21,7 @@ const PortfolioItem = React.memo(({ item, index, theme, onEdit, onDelete }) => {
       toValue: 1,
       duration: 400,
       delay: index * 50,
-      useNativeDriver: true, // GPU ivmelendirmesi
+      useNativeDriver: true,
     }).start();
   }, [index]);
 
@@ -50,10 +48,24 @@ const PortfolioItem = React.memo(({ item, index, theme, onEdit, onDelete }) => {
         </View>
 
         <View style={styles.actions}>
-          <TouchableOpacity style={styles.actionBtn} onPress={() => onEdit(item)}>
+          <TouchableOpacity 
+            style={styles.actionBtn} 
+            onPress={() => {
+              // TEMİZ, TEKİL TIKLAMA HİSSİ
+              if (isHapticEnabled) Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); 
+              onEdit(item);
+            }}
+          >
             <Ionicons name="create-outline" size={20} color={theme.colors.primary} />
           </TouchableOpacity>
-          <TouchableOpacity style={styles.actionBtn} onPress={() => onDelete(item.id)}>
+          <TouchableOpacity 
+            style={styles.actionBtn} 
+            onPress={() => {
+              // UYARI YERİNE DAHA TOK, TEKİL BİR ÇARPMA HİSSİ (Medium/Heavy)
+              if (isHapticEnabled) Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy); 
+              onDelete(item.id);
+            }}
+          >
             <Ionicons name="trash-outline" size={20} color="#FF3D00" />
           </TouchableOpacity>
         </View>
@@ -64,9 +76,13 @@ const PortfolioItem = React.memo(({ item, index, theme, onEdit, onDelete }) => {
 
 export default function PortfolioScreen() {
   const dispatch = useDispatch();
-  const theme = useTheme(); // Merkezi temayı çekiyoruz
+  const theme = useTheme(); 
+  const navigation = useNavigation(); 
+
   const { assets } = useSelector((state) => state.portfolio);
   const { data: cryptoList } = useSelector((state) => state.crypto);
+  
+  const { isHapticEnabled } = useSelector((state) => state.settings);
 
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedCoin, setSelectedCoin] = useState(null);
@@ -81,6 +97,7 @@ export default function PortfolioScreen() {
 
   const handleSave = () => {
     if (!selectedCoin || !amount || parseFloat(amount) <= 0 || !buyPrice || parseFloat(buyPrice) <= 0) {
+      if (isHapticEnabled) Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy); 
       Alert.alert("Eksik Veri", "Lütfen varlık, geçerli bir miktar ve alış maliyeti girin.");
       return;
     }
@@ -89,6 +106,7 @@ export default function PortfolioScreen() {
     const change24h = selectedCoin.price_change_percentage_24h || selectedCoin.priceChange24h || 0;
 
     if (safePrice === 0 || isNaN(safePrice)) {
+      if (isHapticEnabled) Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy); 
       Alert.alert("Veri Hatası", "Piyasa fiyatı okunamadı.");
       return;
     }
@@ -103,6 +121,8 @@ export default function PortfolioScreen() {
       priceChange24h: parseFloat(change24h) 
     };
 
+    // SUCCESS BİLDİRİMİ (ÇİFT ATIM) YERİNE TEKİL, TOK BİR TIKLAMA
+    if (isHapticEnabled) Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); 
     isEditing ? dispatch(updateAsset(assetData)) : dispatch(addAsset(assetData));
     setModalVisible(false);
     resetForm();
@@ -112,19 +132,16 @@ export default function PortfolioScreen() {
     setSelectedCoin(null); setAmount(''); setBuyPrice(''); setIsEditing(false);
   };
 
-  // MİMARİ MÜDAHALE: Canlı API fiyatları ile Cüzdan maliyetlerini karşılaştıran PnL Motoru
   const analytics = useMemo(() => {
     let totalPortfolioValue = 0;
     let totalPortfolioBuyValue = 0;
     let weightedChangeSum = 0;
 
     const processedAssets = assets.map(asset => {
-      // 1. Cüzdandaki coini, canlı API listesinde bul (Fiyatı güncellemek için)
       const liveCoin = cryptoList.find(c => c.id === asset.id);
       const livePrice = liveCoin ? liveCoin.current_price : (asset.price || 0);
       const change24h = liveCoin ? liveCoin.price_change_percentage_24h : (asset.priceChange24h || 0);
       
-      // 2. Güncel değer ve Kar/Zarar hesaplaması
       const currentValue = asset.amount * livePrice;
       const buyValue = asset.amount * (asset.buyPrice || livePrice);
       const pnlValue = currentValue - buyValue;
@@ -141,14 +158,12 @@ export default function PortfolioScreen() {
       };
     });
 
-    // 3. Portföy ağırlıklarını hesapla
     processedAssets.forEach(asset => {
       asset.weightPercentage = totalPortfolioValue > 0 
         ? ((asset.totalValue / totalPortfolioValue) * 100).toFixed(2) 
         : "0.00";
     });
 
-    // 4. Genel toplamları ve yüzdeleri formatla
     const totalPnL = totalPortfolioValue - totalPortfolioBuyValue;
     const pnlPercentage = totalPortfolioBuyValue > 0 
       ? ((totalPnL / totalPortfolioBuyValue) * 100).toFixed(2) 
@@ -173,22 +188,32 @@ export default function PortfolioScreen() {
       name: ` ${item.symbol ? item.symbol.toUpperCase() : 'UNK'}`, 
       population: parseFloat(item.totalValue.toFixed(2)), 
       color: ['#F7931A', '#627EEA', '#26A17B', '#9E9E9E', '#E4405F'][index % 5],
-      legendFontColor: theme.colors.text, // Tema entegrasyonu
+      legendFontColor: theme.colors.text, 
       legendFontSize: 12,
     }));
   }, [analytics.processedAssets, theme]);
 
-  // Cüzdan boş mu dolu mu kontrolü
   const isPortfolioEmpty = analytics.processedAssets.length === 0;
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
-      <Text style={[styles.title, { color: theme.colors.text }]}>Analitik Dashboard</Text>
+      
+      <View style={styles.headerContainer}>
+        <View style={{ width: 30 }} /> 
+        <Text style={[styles.headerTitle, { color: theme.colors.text }]}>Analitik Dashboard</Text>
+        <TouchableOpacity 
+          onPress={() => {
+            if (isHapticEnabled) Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            navigation.navigate('Settings');
+          }} 
+          style={styles.settingsBtn}
+        >
+          <Ionicons name="settings-outline" size={26} color={theme.colors.text} />
+        </TouchableOpacity>
+      </View>
 
-      {/* PORTFÖY DOLUYSA GÖSTERİLECEK BÖLÜM (Grafik ve Kartlar) */}
       {!isPortfolioEmpty ? (
         <>
-          {/* KAR/ZARAR VE VOLATİLİTE KARTI */}
           <View style={[styles.summaryCard, { backgroundColor: theme.colors.card, borderColor: theme.colors.border, borderWidth: 1 }]}>
             <Text style={[styles.summaryTitle, { color: theme.colors.text, opacity: 0.7 }]}>Toplam Portföy Değeri</Text>
             <Text style={[styles.summaryValue, { color: theme.colors.text }]}>
@@ -215,7 +240,7 @@ export default function PortfolioScreen() {
               data={chartData}
               width={screenWidth - 20}
               height={180}
-              chartConfig={{ color: () => theme.colors.text }} // Tema entegrasyonu
+              chartConfig={{ color: () => theme.colors.text }} 
               accessor={"population"}
               backgroundColor={"transparent"}
               paddingLeft={"15"}
@@ -223,7 +248,6 @@ export default function PortfolioScreen() {
             />
           )}
 
-          {/* GPU İvmelendirmeli Liste */}
           <FlatList
             data={analytics.processedAssets}
             keyExtractor={(item) => item.id}
@@ -233,6 +257,7 @@ export default function PortfolioScreen() {
                 item={item} 
                 index={index} 
                 theme={theme}
+                isHapticEnabled={isHapticEnabled} 
                 onDelete={(id) => dispatch(deleteAsset(id))}
                 onEdit={(asset) => {
                   setSelectedCoin(asset);
@@ -246,7 +271,6 @@ export default function PortfolioScreen() {
           />
         </>
       ) : (
-        /* PORTFÖY BOŞSA GÖSTERİLECEK ŞIK EMPTY STATE TASARIMI */
         <View style={styles.emptyStateWrapper}>
           <View style={[styles.iconCircle, { backgroundColor: theme.colors.card }]}>
             <Ionicons name="wallet-outline" size={80} color={theme.colors.primary} />
@@ -258,7 +282,10 @@ export default function PortfolioScreen() {
           
           <TouchableOpacity 
             style={[styles.emptyStateButton, { backgroundColor: theme.colors.primary }]} 
-            onPress={() => { resetForm(); setModalVisible(true); }}
+            onPress={() => { 
+              if (isHapticEnabled) Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+              resetForm(); setModalVisible(true); 
+            }}
             activeOpacity={0.8}
           >
             <Ionicons name="rocket-outline" size={22} color="#FFF" style={{ marginRight: 8 }} />
@@ -267,15 +294,19 @@ export default function PortfolioScreen() {
         </View>
       )}
 
-      {/* SADECE LİSTE DOLUYSA GÖRÜNECEK SABİT EKLEME BUTONU */}
       {!isPortfolioEmpty && (
-        <TouchableOpacity style={[styles.addButton, { backgroundColor: theme.colors.primary }]} onPress={() => { resetForm(); setModalVisible(true); }}>
+        <TouchableOpacity 
+          style={[styles.addButton, { backgroundColor: theme.colors.primary }]} 
+          onPress={() => { 
+            if (isHapticEnabled) Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); 
+            resetForm(); setModalVisible(true); 
+          }}
+        >
           <Ionicons name="add" size={24} color="#FFF" />
           <Text style={styles.addButtonText}>Yeni Varlık Ekle</Text>
         </TouchableOpacity>
       )}
 
-      {/* Temaya Duyarlı Modal */}
       <Modal visible={modalVisible} animationType="slide" transparent={false}>
         <SafeAreaView style={[styles.modalContainer, { backgroundColor: theme.colors.background }]}>
           <View style={styles.modalHeader}>
@@ -297,6 +328,7 @@ export default function PortfolioScreen() {
                   }
                 ]}
                 onPress={() => {
+                  if (isHapticEnabled) Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                   setSelectedCoin(item);
                   if (!isEditing) setBuyPrice(item.current_price.toString());
                 }}
@@ -340,7 +372,9 @@ export default function PortfolioScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  title: { fontSize: 22, fontWeight: '800', textAlign: 'center', marginVertical: 10 },
+  headerContainer: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginHorizontal: 20, marginVertical: 15 },
+  headerTitle: { fontSize: 22, fontWeight: '800', textAlign: 'center' },
+  settingsBtn: { padding: 4 },
   summaryCard: { marginHorizontal: 15, marginBottom: 15, padding: 20, borderRadius: 16, alignItems: 'center' },
   summaryTitle: { fontSize: 13, fontWeight: '600', marginBottom: 5 },
   summaryValue: { fontSize: 28, fontWeight: 'bold' },
@@ -370,8 +404,6 @@ const styles = StyleSheet.create({
   saveButtonText: { color: '#FFF', fontWeight: 'bold', fontSize: 18 },
   coinOption: { paddingHorizontal: 20, paddingVertical: 12, borderWidth: 1.5, borderRadius: 10, marginRight: 10, height: 50, justifyContent: 'center' },
   coinSymbol: { fontWeight: '600' },
-  
-  /* Cüzdan Boş Durumu (Empty State) Stilleri */
   emptyStateWrapper: { flex: 1, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 30, paddingBottom: 50 },
   iconCircle: { width: 120, height: 120, borderRadius: 60, justifyContent: 'center', alignItems: 'center', marginBottom: 25, shadowColor: "#000", shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.1, shadowRadius: 10, elevation: 5 },
   emptyTitle: { fontSize: 26, fontWeight: '800', marginBottom: 15, textAlign: 'center' },

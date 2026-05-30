@@ -29,8 +29,13 @@ const portfolioSlice = createSlice({
     deleteAsset: (state, action) => {
       state.assets = state.assets.filter(asset => asset.id !== action.payload);
     },
+    // YENİ EKLENEN KOD: Portföyü tamamen sıfırlar (Ayarlar sayfasındaki buton için)
+    clearPortfolio: (state) => {
+      state.assets = [];
+    },
   },
 });
 
-export const { addAsset, updateAsset, deleteAsset } = portfolioSlice.actions;
+// clearPortfolio aksiyonunu da dışa aktarıyoruz
+export const { addAsset, updateAsset, deleteAsset, clearPortfolio } = portfolioSlice.actions;
 export default portfolioSlice.reducer;
