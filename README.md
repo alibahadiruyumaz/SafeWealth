@@ -9,7 +9,17 @@ SafeWealth, heterojen finansal ekosistemlerde yer alan kullanıcı portföylerin
 
 ---
 
-Haftalık İlerleme Raporları
+### 🚀 Uygulamayı Hemen İndir ve Test Et
+
+Uygulamanın 11. Hafta (Final) derlemesini Android cihazınıza kurmak için aşağıdaki QR kodu telefonunuzun kamerasına okutabilir veya indirme linkine tıklayabilirsiniz.
+
+**[📱 APK Dosyasını İndir (v1.0.0)](https://github.com/alibahadiruyumaz/SafeWealth/releases/download/v1.0.0/SafeWealth.apk)**
+
+<br>
+
+<img src="https://github.com/user-attachments/assets/48b9b766-b984-43f2-a016-a7cdf69edcbd" width="250" height="250" alt="SafeWealth QR Code">
+
+---
 
 Haftalık İlerleme Raporları
 ---
@@ -93,4 +103,14 @@ Projenin "Privacy-First" vizyonuna uygun olarak, expo-local-authentication altya
 
 Kullanıcı deneyimini iyileştirmek ve performansı artırmak adına, API limitlerine takılmamak için doğrudan Redux State üzerinde çalışan, sıfır gecikmeli yerel arama motoru (Local Search) ve "Tümü / Favorilerim" filtreleme sistemi geliştirildi. Son olarak, portföyün boş olduğu veya arama sonuçlarının bulunamadığı senaryolarda ekranın anlamsız kalmasını engellemek için, uygulamanın otonom temasıyla tam uyumlu kurumsal Empty State (Boş Durum) tasarımları sisteme dahil edildi.
 
-Bu haftaki donanım testlerimi ve geliştirmelerimi detaylıca anlattığım videom şu linktedir: [YouTube Linkinizi Buraya Ekleyin]
+Bu haftaki donanım testlerimi ve geliştirmelerimi detaylıca anlattığım videom şu linktedir: https://youtu.be/b11EW-K6D2E
+
+Hafta 11: Global Haptic Engine, UI/UX Cilası ve EAS Production Build
+
+Hocam, bu hafta projenin "Code Freeze" (Kod Dondurma) aşamasını tamamlayarak, donanım seviyesindeki son optimizasyonları ve nihai Production (Canlı) derleme işlemlerini gerçekleştirdim.
+
+Kullanıcı deneyimini artırmak için projeye expo-haptics (dokunsal geri bildirim) entegre ettim ve bu ayarı Redux (settingsSlice) üzerinden global state'e bağlayarak cihaz hafızasında kalıcı olmasını sağladım. Çapraz platform (Cross-Platform) sorunlarından olan Android'deki donanımsal "çift titreşim" (double pulse) çakışmasını Platform.OS kontrolüyle izole ettim. React Navigation sayfa geçişlerindeki kronik "beyaz ekran parlaması" zafiyetini ise kök katmanda arka plan sabitlemesi yaparak kökten çözdüm. Ayrıca, kritik veri silme işlemlerindeki ilkel uyarı pencerelerini (Native Alert), uygulamanın temasına otonom tepki veren özel bir Modal (Custom Alert) yapısıyla değiştirdim.
+
+Son olarak, uygulamanın bağımsız bir ürüne dönüşmesi için Expo Application Services (EAS) CLI yapılandırmasını tamamladım. eas.json dosyasını doğrudan cihaza yüklenebilir "buildType: apk" formatında konfigüre ederek, projenin nihai kurulum dosyasını (APK) bulut sunucularında derledim ve fiziksel cihaza aktarımını başarıyla gerçekleştirdim.
+
+Bu haftaki son optimizasyonları ve canlı APK derleme sürecimi anlattığım videom şu linktedir: [VİDEO_LİNKİ_BURAYA_GELECEK]
