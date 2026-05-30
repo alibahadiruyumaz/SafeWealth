@@ -13,7 +13,7 @@ SafeWealth, heterojen finansal ekosistemlerde yer alan kullanıcı portföylerin
 
 Uygulamanın 11. Hafta (Final) derlemesini Android cihazınıza kurmak için aşağıdaki QR kodu telefonunuzun kamerasına okutabilir veya indirme linkine tıklayabilirsiniz.
 
-[📱 APK Dosyasını İndir (v1.0.0)] (Buraya GitHub Releases linkini ekle)
+[📱 APK Dosyasını İndir (v1.0.0)] 
 
 (Buraya da kendi oluşturduğun kalıcı QR kodun görselini ekle)
 
