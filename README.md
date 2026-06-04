@@ -113,4 +113,4 @@ Kullanıcı deneyimini artırmak için projeye expo-haptics (dokunsal geri bildi
 
 Son olarak, uygulamanın bağımsız bir ürüne dönüşmesi için Expo Application Services (EAS) CLI yapılandırmasını tamamladım. eas.json dosyasını doğrudan cihaza yüklenebilir "buildType: apk" formatında konfigüre ederek, projenin nihai kurulum dosyasını (APK) bulut sunucularında derledim ve fiziksel cihaza aktarımını başarıyla gerçekleştirdim.
 
-Bu haftaki son optimizasyonları ve canlı APK derleme sürecimi anlattığım videom şu linktedir: [VİDEO_LİNKİ_BURAYA_GELECEK]
+Bu haftaki son optimizasyonları ve canlı APK derleme sürecimi anlattığım videom şu linktedir: https://youtu.be/uCQhGbaYOvw
